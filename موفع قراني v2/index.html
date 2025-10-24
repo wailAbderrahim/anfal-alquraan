@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>الأنفال للقرآن</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#22c55e',
+            secondary: '#14532d',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      transition: background-color 0.4s, color 0.4s;
+    }
+    .aya-ar {
+      font-size: 1.3rem;
+      line-height: 2;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #16a34a;
+      border-radius: 10px;
+    }
+    .surah-btn:hover {
+      background: rgba(34,197,94,0.1);
+    }
+    #verses {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    /* عند تمرير الفأرة على زر السورة */
+.surah-btn:hover {
+  background: rgba(34, 197, 94, 0.1);
+  color: #14532d; /* النص يصير غامق في الوضع العادي */
+}
+
+/* في الوضع الداكن */
+.dark .surah-btn:hover {
+  background: #f9fafb; /* خلفية فاتحة شوية */
+  color: #111827; /* النص يصبح غامق (أسود رمادي) */
+}
+  </style>
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300">
+
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-30">
+    <div class="container mx-auto p-4 flex items-center justify-between flex-wrap gap-2">
+      <h1 class="text-2xl font-bold text-primary dark:text-green-400">الأنفال للقرآن</h1>
+
+      <div class="flex items-center gap-3 flex-wrap">
+        <label class="flex items-center gap-2 text-sm cursor-pointer">
+          <input id="toggle-translation" type="checkbox" checked class="w-4 h-4 accent-green-600" />
+          <span>إظهار الترجمة</span>
+        </label>
+
+        <button id="btn-theme"
+                class="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-500
+                       text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+          🌙 وضع داكن
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="container mx-auto flex-1 p-4 grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6">
+
+    <!-- Mobile Dropdown -->
+    <div class="block md:hidden mb-4">
+      <button id="toggle-surahs"
+              class="w-full bg-green-500 text-white py-2 rounded-md font-semibold flex items-center justify-between">
+        <span>📖 اختر سورة</span>
+        <span id="dropdown-icon">▼</span>
+      </button>
+      <div id="mobile-surah-list" class="hidden mt-2 bg-white dark:bg-gray-800 shadow-md rounded-lg p-3 max-h-64 overflow-auto"></div>
+    </div>
+
+    <!-- Aside (desktop only) -->
+    <aside id="aside" class="hidden md:flex bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 h-fit md:h-[80vh] overflow-hidden flex-col">
+      <div class="mb-4">
+        <input id="search" type="search" placeholder="ابحث باسم السورة أو رقمها"
+               class="w-full p-2 border rounded-md focus:ring-2 focus:ring-green-400
+                      dark:bg-gray-700 dark:text-white dark:border-gray-600 outline-none" />
+      </div>
+      <div id="surah-list" class="overflow-auto flex-1 space-y-2 pr-2"></div>
+    </aside>
+
+    <!-- Section -->
+    <section id="section" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 relative">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+        <div class="info">
+          <h2 id="surah-title" class="text-2xl font-semibold text-primary dark:text-green-400">
+            افتح سورة من القائمة
+          </h2>
+          <p id="surah-info" class="text-sm text-gray-500 dark:text-gray-300"></p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-3">
+          <audio id="audio-player" controls
+                 class="w-full md:w-72 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded border dark:border-gray-600 p-2">
+            متصفحك لا يدعم عنصر الصوت.
+          </audio>
+          <select id="reciter"
+                  class="p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-green-400">
+            <option value="ar.alafasy">العفاسي</option>
+            <option value="ar.abdulbasitmurattal">عبد الباسط (مرتل)</option>
+            <option value="ar.husary">الحصري</option>
+            <option value="ar.minshawi">المنشاوي</option>
+            <option value="ar.mahermuaiqly">ماهر المعيقلي</option>
+            <option value="ar.sudais">السديس</option>
+            <option value="ar.shuraym">الشريم</option>
+            <option value="ar.ahmedajamy">أحمد العجمي</option>
+            <option value="ar.misharyrashid">مشاري راشد</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="verses" class="space-y-6"></div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 p-4 text-center text-sm text-gray-500 dark:text-gray-300">
+    Designed By <span class="text-green-600 dark:text-green-400 font-medium">Mouhieddin Wael Abderrahim</span>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="data/data.js"></script>
+  <script type="module" src="scripts/surahsList.js"></script>
+
+  <script>
+    // تبديل الوضع الليلي
+    const btnTheme = document.getElementById("btn-theme");
+    btnTheme.addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark");
+      btnTheme.textContent =
+        document.documentElement.classList.contains("dark")
+          ? "☀️ وضع فاتح"
+          : "🌙 وضع داكن";
+    });
+
+    // منسدلة الموبايل
+    const toggleBtn = document.getElementById('toggle-surahs');
+    const mobileList = document.getElementById('mobile-surah-list');
+    const dropdownIcon = document.getElementById('dropdown-icon');
+
+    toggleBtn.addEventListener('click', () => {
+      mobileList.classList.toggle('hidden');
+      dropdownIcon.textContent = mobileList.classList.contains('hidden') ? '▼' : '▲';
+    });
+  </script>
+</body>
+</html>
